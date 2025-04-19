@@ -1,0 +1,24 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+form {
+    padding: 10px;
+    background-color: hsl(60, 60%, 90%);
+    /* display: grid; */
+}
+
+.option {
+    display: flex;
+}
+
+label {
+    font-size: 1.2em;
+}
