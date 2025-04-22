@@ -22,3 +22,14 @@ form {
 label {
     font-size: 1.2em;
 }
+
+section.files {
+    display: flex;
+}
+
+.file {
+    padding: 5px;
+    margin: 0 3px;
+    background-color: hsl(260, 80%, 90%);
+    cursor: pointer;
+}

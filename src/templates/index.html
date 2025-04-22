@@ -1,11 +1,22 @@
 {% extends 'base.html' %} {% block head %}
 <title>Nodes Map</title>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
 {% endblock %} {% block body %}
 <h1>Nodes Map</h1>
 <form action="/map" method="POST" enctype="multipart/form-data">
   <div class="option">
-    <label for="nodesFile">Choose nodes file:</label>
-    <input type="file" id="nodesFile" name="nodesFile" />
+    <label>Choose nodes file:</label>
+    <section class="files">
+      {% for file in files %}
+      <div class="file" onclick="selectFile('{{ file }}')">{{ file }}</div>
+      {% endfor %}
+    </section>
+    <input
+      type="text"
+      name="nodes_file"
+      id="nodes_file"
+      value="No file selected"
+    />
   </div>
   <button type="submit">Create Map</button>
 </form>
