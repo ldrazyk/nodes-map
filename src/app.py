@@ -14,9 +14,15 @@ def index():
 @app.post("/map")
 def show_map():
     
-    nodes_file = request.form.get('nodes_file')
+    map_name = request.form.get('map_name')
     
-    return jsonify({'nodes_file': nodes_file})
+    nodes_file = request.form.get('nodes_file')
+    nodes_data = model.get_nodes_data(nodes_file)
+    
+    data = {'map_name': map_name, 'nodes': nodes_data}
+    print(data)
+    
+    return render_template('map.html', map_name=map_name, nodes=nodes_data)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5007)

@@ -1,6 +1,6 @@
 {% extends 'base.html' %} {% block head %}
-<title>Nodes Map</title>
-<script src="{{ url_for('static', filename='script.js') }}"></script>
+<title>Nodes Map Form</title>
+<script src="{{ url_for('static', filename='index.js') }}"></script>
 {% endblock %} {% block body %}
 <h1>Nodes Map</h1>
 <form action="/map" method="POST" enctype="multipart/form-data">
@@ -17,6 +17,10 @@
       id="nodes_file"
       value="No file selected"
     />
+  </div>
+  <div class="option">
+    <label for="map_name">Map name:</label>
+    <input type="text" name="map_name" id="map_name" value="" />
   </div>
   <button type="submit">Create Map</button>
 </form>
