@@ -31,3 +31,20 @@ class Model:
             return data
         else:
             return False
+        
+    def get_extremes(self, nodes):
+        
+        x = []
+        y = []
+        
+        for node in nodes:
+            
+            x.append(node['x'])
+            y.append(node['y'])
+            
+        return {
+            "min_x": min(x),
+            "max_x": max(x),
+            "min_y": min(y),
+            "max_y": max(y),
+        }

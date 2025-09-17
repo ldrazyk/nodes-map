@@ -1,20 +1,9 @@
 {% extends 'base.html' %} {% block head %}
-<title>Node Map: '{{ map_name }}'</title>
+<title>Pixi.js Node Map: '{{ map_name }}'</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='map.css') }}" />
 <script src="{{ url_for('static', filename='map.js') }}"></script>
 {% endblock %} {% block body %}
 <h1 class="map_name">{{ map_name }}</h1>
-
-<section class="nodes_list">
-  {% for node in nodes %}
-  <div class="node_info" id="{{ node['id'] }}">
-    <p>id: {{ node['id'] }}</p>
-    <p>label: {{ node['label'] }}</p>
-    <p>x: {{ node['x'] }}</p>
-    <p>y: {{ node['y'] }}</p>
-  </div>
-  {% endfor %}
-</section>
 
 <section class="map_area" data-min-x={{ extremes['min_x'] }} data-max-x={{ extremes['max_x'] }} data-min-y={{ extremes['min_y'] }} data-max-y={{ extremes['max_y'] }} >
   {% for node in nodes %}

@@ -1,0 +1,1 @@
+console.log("static/map.js script running...")

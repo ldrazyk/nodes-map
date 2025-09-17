@@ -17,12 +17,22 @@ def show_map():
     map_name = request.form.get('map_name')
     
     nodes_file = request.form.get('nodes_file')
-    nodes_data = model.get_nodes_data(nodes_file)
+    nodes = model.get_nodes_data(nodes_file)
     
-    data = {'map_name': map_name, 'nodes': nodes_data}
-    print(data)
+    if nodes:
+        
+        extremes = model.get_extremes(nodes)
+        
+        def print_data():
+            data = {'map_name': map_name, 'nodes': nodes, 'extremes': extremes}
+            print(data)
+            
+        print_data()
+        
+        return render_template('map_pixi.html', map_name=map_name, nodes=nodes, extremes=extremes)
     
-    return render_template('map.html', map_name=map_name, nodes=nodes_data)
+    else:
+        return "Nodes not found!"
 
 if __name__ == '__main__':
     app.run(debug=True, port=5007)
