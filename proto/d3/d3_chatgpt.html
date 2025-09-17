@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>D3.js Correlation Map</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    svg {
+      border: 1px solid #ccc;
+      background: #f9f9f9;
+    }
+    image {
+      pointer-events: all;
+    }
+    text {
+      font-size: 12px;
+      fill: black;
+    }
+  </style>
+</head>
+<body>
+  <h2>Correlation Map (D3.js)</h2>
+  <svg id="map" width="800" height="600"></svg>
+
+  <script>
+    const nodes = [
+      {x: 100, y: 150, label: "Node A", image: "img1.png", size: 1},
+      {x: 300, y: 250, label: "Node B", image: "img2.png", size: 0.5},
+      {x: 200, y: 100, label: "Node C", image: "img3.png", size: 0.7},
+      {x: 400, y: 100, label: "Node D", image: "/home/lukasz/data/go/make/it/projects/nodes_map/proto/canvas/img/FIN.png", size: 0.8}
+    ];
+
+    const width = 800, height = 600;
+
+    const svg = d3.select("#map")
+      .attr("width", width)
+      .attr("height", height);
+
+    // Container for zoom/pan
+    const container = svg.append("g");
+
+    // Add images
+    container.selectAll("image")
+      .data(nodes)
+      .enter()
+      .append("image")
+      .attr("x", d => d.x)
+      .attr("y", d => d.y)
+      .attr("width", d => d.size * 48)
+      .attr("height", d => d.size * 48)
+      .attr("href", d => d.image);
+
+    // Add labels
+    container.selectAll("text")
+      .data(nodes)
+      .enter()
+      .append("text")
+      .attr("x", d => d.x + d.size * 24)  // center below image
+      .attr("y", d => d.y + d.size * 50 + 10)
+      .attr("text-anchor", "middle")
+      .text(d => d.label);
+
+    // Add zoom/pan behavior
+    const zoom = d3.zoom()
+      .scaleExtent([0.5, 10]) // min and max zoom
+      .on("zoom", (event) => {
+        container.attr("transform", event.transform);
+      });
+
+    svg.call(zoom);
+  </script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+canvas {
+    border: 1px solid black;
+    background-color: #38638c;
+    cursor: grab;
+}
+
+canvas:active {
+    cursor: grabbing;
+}

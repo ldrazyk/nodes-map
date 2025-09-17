@@ -3,3 +3,5 @@ desktop.ini
 data/
 archival/
 img/
+*.png
+*.jpg
