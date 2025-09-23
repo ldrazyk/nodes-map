@@ -1,7 +1,8 @@
+.venv/
 __pycache__
 desktop.ini
 data/
-archival/
+archive/
 img/
 *.png
 *.jpg
