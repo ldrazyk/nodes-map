@@ -1,11 +1,12 @@
 from flask import Flask
-from .model import utils
+from .model import EmbeddingsProcessor
 
 def create_app():
 
     app = Flask(__name__)
 
-    global utils
+    global embeddings_processor
+    embeddings_processor = EmbeddingsProcessor(random_state=33)
 
     from .main.routes import main
     app.register_blueprint(main)
