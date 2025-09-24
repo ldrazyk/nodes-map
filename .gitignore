@@ -2,6 +2,7 @@
 __pycache__
 desktop.ini
 data/
+learn/
 archive/
 img/
 *.png
