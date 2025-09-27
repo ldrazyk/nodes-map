@@ -1,11 +1,11 @@
-from src.app.model import MapCreator, EmbeddingsProcessor
+from src.app.model import Mapper, EmbeddingsProcessor
 import numpy as np
 import pprint
 
-creator = MapCreator(random_state=11, min_cluster_size=2, max_cluster_size=0, n_neighbors=5, metric="cosine", min_dist=0.5, spread=2.0)
+mapper = Mapper(random_state=11, min_cluster_size=2, max_cluster_size=0, n_neighbors=5, metric="cosine", min_dist=0.5, spread=2.0)
 processor = EmbeddingsProcessor()
 
-def test_MapCreator():
+def test_Mapper():
 
     def test_create_map():
 
@@ -18,7 +18,7 @@ def test_MapCreator():
             else:
                 nodes_spec["matrix"] = matrix
 
-            map = creator.create_map(nodes_spec=nodes_spec, umap_spec=umap_spec)
+            map = mapper.create_map(nodes_spec=nodes_spec, umap_spec=umap_spec)
             pprint.pprint(map)
 
         def test_emb_countries():

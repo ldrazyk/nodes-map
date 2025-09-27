@@ -1,10 +1,17 @@
 from flask import jsonify, request, Response
 from . import api
-from app import embeddings_processor
+from app import application, embeddings_processor
 
 @api.route('/')
 def api_home():
     return "This is API"
+
+@api.post('/map/example')
+def get_map_example():
+
+    data = request.get_json()
+    map_data = application.get_map_example(data.get('id'))
+    return jsonify(map_data)
 
 @api.post('/embeddings/combine')
 def combine_embeddings():

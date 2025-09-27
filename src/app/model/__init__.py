@@ -1,2 +1,3 @@
+from .Application import Application
 from .EmbeddingsProcessor import EmbeddingsProcessor
-from .MapCreator import MapCreator
+from .Mapper import Mapper

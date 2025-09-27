@@ -4,7 +4,7 @@ import numpy as np
 from numpy import ndarray
 from pprint import pprint
 
-class MapCreator:
+class Mapper:
 
     def __init__(self, random_state:int=22, min_cluster_size:int=2, max_cluster_size:int=0, metric:str="euclidean", n_neighbors:int=5, 
                  min_dist:float=0.1, spread:float=1):
@@ -88,7 +88,7 @@ class MapCreator:
                 }
 
                 for key, spec_list in nodes_spec.items():
-                    if key != "embedding":
+                    if key not in ("embedding", "matrix"):
                         node[key] = spec_list[n]
                 
                 nodes.append(node)
