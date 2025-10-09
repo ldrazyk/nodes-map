@@ -1,3 +1,3 @@
 from .Application import Application
-from .EmbeddingsProcessor import EmbeddingsProcessor
+from .Preprocessor import Preprocessor
 from .Mapper import Mapper

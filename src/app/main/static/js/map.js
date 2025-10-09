@@ -3,7 +3,7 @@
 
 const SvgMap = function () {
     
-    let nodes;
+    let nodes, spec;
     let svg, container;
     const width = 1600, height = 700;
     
@@ -12,16 +12,9 @@ const SvgMap = function () {
         document.getElementById("map").style.backgroundColor = "hsla(78, 69%, 69%, 1.00)";
     };
 
-    const fetchMapExample = async function (map_id) {
+    const fetchMapExample = async function (mapId) {
         
-        const response = await fetch(
-            "http://localhost:3000/api/map/example",
-            {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ id: map_id })
-            }
-        );
+        const response = await fetch(`http://localhost:3000/api/map?id=${mapId}`);
         
         return await response.json();
     };
@@ -34,7 +27,7 @@ const SvgMap = function () {
 
     const updateMap = async function () {
 
-        const update = function (nodes) {
+        const updateSvg = function (nodes) {
             
             const buildScales = function () {
 
@@ -66,13 +59,21 @@ const SvgMap = function () {
                 .attr("class", "label")
                 .text(d => d.label);
         };
-        
-        const animals_id = "animals";
-        const countries_id = "countries"
 
-        nodes = await fetchMapExample(countries_id);
+        const updateInfo = function (spec) {
+
+            document.getElementById("mapName").textContent = spec["map_name"];
+        };
+        
+        const mapId = document.querySelector("head").dataset.mapid;
+
+        const map = await fetchMapExample(mapId);
+        nodes = map.nodes;
+        spec = map.spec;
         console.log(nodes);
-        update(nodes);
+        console.log(spec);
+        updateSvg(nodes);
+        updateInfo(spec);
 
         const zoom = d3.zoom()
             .scaleExtent([0.5, 10]) // min and max zoom
@@ -81,7 +82,6 @@ const SvgMap = function () {
             });
 
         svg.call(zoom);
-
     };
 
     

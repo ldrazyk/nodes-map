@@ -1,0 +1,36 @@
+:root {
+    --accent-color: hsl(44, 62%, 36%);
+}
+
+input,
+button,
+select,
+textarea {
+    font: inherit;
+}
+
+form {
+    display: grid;
+}
+
+form section {
+    display: grid;
+    border: 1px solid gray;
+    padding: 5px;
+}
+
+.line {
+    display: grid;
+}
+
+.line:has([type="checkbox"]) {
+    display: flex;
+}
+
+input {
+    accent-color: var(--accent-color);
+}
+
+input[type="checkbox"] {
+    margin: 0 5px;
+}

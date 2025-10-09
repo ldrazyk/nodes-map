@@ -1,0 +1,13 @@
+{% macro render(id, label, type='text', reverse='False') %}
+    {% if reverse == 'True' %}
+        <div class="line">
+            <input type="{{ type }}" name="{{ id }}" id="{{ id }}">
+            <label for="{{ id }}">{{ label }}</label>
+        </div>
+    {% else %}
+        <div class="line">
+            <label for="{{ id }}">{{ label }}</label>
+            <input type="{{ type }}" name="{{ id }}" id="{{ id }}">
+        </div>
+    {% endif %}
+{% endmacro %}

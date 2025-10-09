@@ -1,12 +1,10 @@
 from flask import Flask
-from .model import Application, EmbeddingsProcessor
+from .model import Application
 
 def create_app():
 
     app = Flask(__name__)
 
-    global embeddings_processor
-    embeddings_processor = EmbeddingsProcessor(random_state=33)
     global application
     application = Application()
 

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map Form</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/reset.css') }}">
+    <link rel="stylesheet" href="{{ url_for('main.static', filename='style/form.css') }}">
+</head>
+<body>
+    {% import "input_line.html" as input_line %}
+    <div class="container">
+        <section id="create-map">
+            <h1>Create Map</h1>
+            <form action="/api/map/create" method="post" target="_blank">
+                {{ input_line.render("map-name", "map name:") }}
+                <section>
+                    <h2>Nodes Spec</h2>
+
+
+                    <div class="line">
+                        {{ input_line.render("spec-src", "url / path:") }}
+                        {{ input_line.render("spec-id", "id:") }}
+                    </div>
+
+                </section>
+                <section>
+                    <h2>Map Settings</h2>
+                    <section>
+                        <h3>Preprocessing</h3>
+                        <section>
+                            <h4>Dimensions / Features</h4>
+
+                            {{ input_line.render("scale-features", "scale/standardize features", "checkbox", reverse="True") }}
+                            
+                        </section>
+                        <section>
+                            <h4>Vectors / Embeddings</h4>
+                            
+                            {{ input_line.render("normalize", "normalize", "checkbox") }}
+                            
+                            <section>
+                                {{ input_line.render("reduce", "reduce", "checkbox") }}
+                                {{ input_line.render("normalize-reduce-input", "normalize input", "checkbox") }}
+                                <div class="line">
+                                    <label for="reduction-size">reduction size</label>
+                                    <input type="number" name="reduction-size" id="reduction-size" min="32" max="256" step="16" value="64">
+                                </div>
+                                {{ input_line.render("normalize-reduce-output", "normalize output", "checkbox") }}
+                            </section>
+                            <section>
+                                {{ input_line.render("combine", "combine", "checkbox") }}
+                                <section>
+                                    {{ input_line.render("normalize-combine-input", "normalize input", "checkbox") }}
+                                    <div class="line">
+                                        <label for="input-reduction-size">input reduction size</label>
+                                        <input type="number" name="input-reduction-size" id="input-reduction-size" min="32" max="256" step="16" value="64">
+                                    </div>
+                                    <div class="line">
+                                        <label for="output-reduction-size">output reduction size</label>
+                                        <input type="number" name="output-reduction-size" id="output-reduction-size" min="32" max="256" step="16" value="128">
+                                    </div>
+                                    {{ input_line.render("normalize-combine-output", "normalize output", "checkbox") }}
+                                </section>
+                            </section>
+                        </section>
+                    </section>
+                    <section>
+                        <h3>Clustering</h3>
+                        <div class="line">
+                            <label for="cluster">cluster</label>
+                            <input type="checkbox" name="cluster" id="cluster">
+                        </div>
+                        <section>
+                            <h4>Cluster Size</h4>
+                            <div class="line">
+                                <label for="min-cluster">min:</label>
+                                <input type="number" name="min-cluster" id="min-cluster" min="0" max="20" step="1" value="0">
+                                <label for="max-cluster">max:</label>
+                                <input type="number" name="max-cluster" id="max-cluster" min="0" max="50" step="1" value="0">
+                            </div>
+                        </section>
+                    </section>
+                    <section>
+                        <h3>Mapping</h3>
+                        <div class="line">
+                            <label for="metric">metric:</label>
+                            <select name="metric" id="metric">
+                                <option value="cosine">cosine</option>
+                                <option value="euclidean">euclidean</option>
+                            </select>
+                            <div class="line">
+                                <label for="n-neighbors">n neighbors</label>
+                                <input type="number" name="n-neighbors" id="n-neighbors" min="0" max="20" step="1" value="3">
+                            </div>
+                            <div class="line">
+                                <label for="random-state">random state</label>
+                                <input type="number" name="random-state" id="random-state" min="1" max="999" step="1" value="22">
+                            </div>
+                            <div class="line">
+                                <label for="min-distance">min distance</label>
+                                <input type="number" name="min-distance" id="min-distance" min="0.1" max="10.0" step="0.1" value="0.1">
+                            </div>
+                            <div class="line">
+                                <label for="spread">spread</label>
+                                <input type="number" name="spread" id="spread" min="0.5" max="10.0" step="0.1" value="1.0">
+                            </div>
+                        </div>
+                    </section>
+
+                </section>
+                <button type="submit">Create & Show Map</button>
+                <button type="reset">Reset</button>
+            </form>
+        </section>
+        <section id="showMap">
+            <h1>Show Map</h1>
+            <form action="/map" method="get" target="_blank">
+
+                <label for="map-id">map id:</label>
+                <select name="id" id="map-id">
+                    {% for id in map_ids %}
+                        <option value="{{ id }}">{{ id }}</option>
+                    {% endfor %}
+                </select>
+
+                <!-- {{ input_line.render("mapId", "map id:") }} -->
+                <button type="submit">Show Map</button>
+            </form>
+
+        </section>
+    </div>
+</body>
+</html>

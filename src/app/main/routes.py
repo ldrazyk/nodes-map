@@ -1,10 +1,24 @@
-from flask import render_template
+from flask import render_template, request, jsonify
 from . import main
+from app import application
 
 @main.route('/')
-def home():
-    return render_template('home.html')
+def show_form():
+
+    map_ids = application.get_map_ids()
+
+    return render_template('form.html', map_ids=map_ids)
 
 @main.route('/map')
 def show_map():
-    return render_template('map.html')
+
+    map_id = request.args.get("id")
+
+    return render_template('map.html', map_id=map_id)
+
+@main.route('/map/test')
+def test_map():
+
+    id = request.args.get("mapId")
+
+    return f"This is '{id}' map."

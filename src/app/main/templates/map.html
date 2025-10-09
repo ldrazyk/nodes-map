@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+<head data-mapid="{{ map_id }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Map</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='style/reset.css') }}">
     <link rel="stylesheet" href="{{ url_for('main.static', filename='style/map.css') }}">
-
 </head>
 <body>
     <div class="container">
