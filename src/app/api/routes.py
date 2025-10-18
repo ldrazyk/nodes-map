@@ -12,6 +12,10 @@ def get_map():
 
     id = request.args["id"]
     map_data = application.get_map(id)
+    if "image" in map_data["nodes"][0]:
+        for node in map_data["nodes"]:
+            if "image" in node:
+                node["image"] = url_for('static', filename=f"images/{node["image"]}")
     return jsonify(map_data)
 
 @api.post('/map/example')
@@ -60,7 +64,7 @@ def create_map():
         def create_preprocess_spec(form:dict):
 
             projection = {
-                "scale-features": ["scale_features", bool],
+                "standardize-features": ["standardize_features", bool],
                 "normalize": ["normalize", bool],
                 "reduce": ["reduce", bool],
                 "normalize-reduce-input": ["normalize_reduce_input", bool],
@@ -82,7 +86,7 @@ def create_map():
                 "min-cluster": ["min_cluster", int],
                 "max-cluster": ["max_cluster", int],
                 "metric": ["metric", str],
-                "n-neighors": ["n_neighbors", int],
+                "n-neighbors": ["n_neighbors", int],
                 "random-state": ["random_state", int],
                 "min-distance": ["min_distance", float],
                 "spread": ["spread", float]

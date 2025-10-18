@@ -7,3 +7,4 @@ archive/
 img/
 *.png
 *.jpg
+d3*.js

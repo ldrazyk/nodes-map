@@ -17,7 +17,9 @@ class Application:
 
         self.mapper = Mapper()
         self.preprocessor = Preprocessor()
-        self.nodes_spec_api = NodesSpecApi()
+        self.nodes_spec_api = NodesSpecApi(storage=self.storage, 
+                                          files_manager=self.files_manager, 
+                                          text_editor=self.text_editor)
         self.maps_repository = Repository(dir="data/maps", 
                                           dir_id="maps_repo", 
                                           storage=self.storage, 
@@ -55,14 +57,15 @@ class Application:
                 params["id"] = id
                 
             response = requests.get(url=api_spec["url"], params=params)
-            pprint(response)
-            return self.__get_data_from_response(response)
+            nodes_spec = self.__get_data_from_response(response)
+            # print(nodes_spec)
+            return nodes_spec
         
         def preprocess(nodes_spec:dict, preprocess_spec:dict):
 
-            def scale_features(nodes_spec:dict):
+            def standardize_features(nodes_spec:dict):
                 
-                nodes_spec["embedding"] = self.preprocessor.scale_features(nodes_spec["embedding"])
+                nodes_spec["embedding"] = self.preprocessor.standardize_features(nodes_spec["embedding"])
 
             def normalize_embeddings(nodes_spec:dict):
 
@@ -82,20 +85,29 @@ class Application:
                                                                                 final_size=preprocess_spec["output_reduction_size"],
                                                                                 normalize_input=preprocess_spec.get("normalize_combine_input"),
                                                                                 normalize_output=preprocess_spec.get("normalize_combine_output"))
+                
+            def scale_features(nodes_spec:dict):
+
+                nodes_spec["embedding"] = self.preprocessor.scale_features(embeddings=nodes_spec["embedding"], 
+                                                                           feature_scale=nodes_spec["feature_scale"])
             
             if "embedding" in nodes_spec:
 
                 print("Preprocessing embeddings...")
 
-                if "scale_features" in preprocess_spec:
-                    scale_features(nodes_spec)
+                if "standardize_features" in preprocess_spec:
+                    standardize_features(nodes_spec)
 
                 if "combine" in preprocess_spec:
                     combine_embeddings(nodes_spec, preprocess_spec)
                 elif "reduce" in preprocess_spec:
                     reduce_embeddings(nodes_spec, preprocess_spec)
-                elif "normalize" in preprocess_spec or "scale_features" in preprocess_spec:
+                elif "normalize" in preprocess_spec:
                     normalize_embeddings(nodes_spec)
+
+                if "feature_scale" in nodes_spec:
+                    scale_features(nodes_spec)
+
 
         def create(nodes_spec:dict, mapping_spec:dict):
 
@@ -120,7 +132,9 @@ class Application:
         
         if nodes_spec:
 
+            # pprint(nodes_spec.get("embedding"))
             preprocess(nodes_spec, preprocess_spec)
+            # pprint(nodes_spec.get("embedding"))
             nodes = create(nodes_spec, mapping_spec)
             id = store_map(map_name, {"nodes": nodes, "spec": spec})
             if id:

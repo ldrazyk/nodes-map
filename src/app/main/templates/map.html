@@ -4,16 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Map</title>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="{{ url_for('main.static', filename='js/d3.v7.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='style/reset.css') }}">
     <link rel="stylesheet" href="{{ url_for('main.static', filename='style/map.css') }}">
+    <link rel="stylesheet" href="{{ url_for('main.static', filename='style/map_menu.css') }}">
 </head>
 <body>
     <div class="container">
         <h2 id="mapName">Map Name</h2>
         <svg id="map"></svg>
     </div>
+
+    {% include "map_menu.html" %}
     
     <script src="{{ url_for('main.static', filename='js/map.js') }}"></script>
+    <script src="{{ url_for('main.static', filename='js/map_menu.js') }}"></script>
 </body>
 </html>

@@ -11,3 +11,11 @@ svg#map {
     background-color: hsl(200, 30%, 80%);
     flex-grow: 1;
 }
+
+text.label {
+    /* font-size: 5px; */
+}
+
+g.node>rect {
+    fill: gray;
+}

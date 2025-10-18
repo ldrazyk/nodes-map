@@ -26,8 +26,8 @@ class Preprocessor:
 
 
         if isinstance(embeddings_models[0][0], (list, tuple)):
-            embeddings_models = np.array(embeddings_models)
-            # embeddings_models = [[np.array(embedding) for embedding in model] for model in embeddings_models]
+            # embeddings_models = np.array(embeddings_models)
+            embeddings_models = [[np.array(embedding) for embedding in model] for model in embeddings_models]
         
         if normalize_input:
             embeddings_models = [normalize(model) for model in embeddings_models]
@@ -78,12 +78,24 @@ class Preprocessor:
 
         return embeddings
 
-    def scale_features(self, embeddings:list[list|ndarray], to_lists:bool=False):
+    def standardize_features(self, embeddings:list[list|ndarray], to_lists:bool=False):
 
         embeddings = self.__embeddings_to_ndarray(embeddings)
 
         scaler = StandardScaler()
         embeddings = scaler.fit_transform(embeddings)
+
+        if to_lists:
+            embeddings = self.__embeddings_to_list(embeddings)
+
+        return embeddings
+    
+    def scale_features(self, embeddings:list[list|ndarray], feature_scale:list[float], to_lists:bool=False):
+
+        embeddings = self.__embeddings_to_ndarray(embeddings)
+        feature_scale = np.array(feature_scale)
+
+        embeddings = embeddings * feature_scale
 
         if to_lists:
             embeddings = self.__embeddings_to_list(embeddings)

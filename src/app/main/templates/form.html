@@ -31,7 +31,7 @@
                         <section>
                             <h4>Dimensions / Features</h4>
 
-                            {{ input_line.render("scale-features", "scale/standardize features", "checkbox", reverse="True") }}
+                            {{ input_line.render("standardize-features", "standardize features", "checkbox", reverse="True") }}
                             
                         </section>
                         <section>
@@ -75,7 +75,7 @@
                             <h4>Cluster Size</h4>
                             <div class="line">
                                 <label for="min-cluster">min:</label>
-                                <input type="number" name="min-cluster" id="min-cluster" min="0" max="20" step="1" value="0">
+                                <input type="number" name="min-cluster" id="min-cluster" min="1" max="20" step="1" value="1">
                                 <label for="max-cluster">max:</label>
                                 <input type="number" name="max-cluster" id="max-cluster" min="0" max="50" step="1" value="0">
                             </div>
@@ -91,7 +91,7 @@
                             </select>
                             <div class="line">
                                 <label for="n-neighbors">n neighbors</label>
-                                <input type="number" name="n-neighbors" id="n-neighbors" min="0" max="20" step="1" value="3">
+                                <input type="number" name="n-neighbors" id="n-neighbors" min="2" max="100" step="1" value="15">
                             </div>
                             <div class="line">
                                 <label for="random-state">random state</label>
