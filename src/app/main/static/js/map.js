@@ -1,4 +1,54 @@
 
+
+const NodesMap = function () {
+    
+    let nodes, spec;
+    let mediator;
+
+    const init = async function () {
+
+        const fetchMap = async function (mapId) {
+            
+            const response = await fetch(`http://localhost:3000/api/map?id=${mapId}`);
+            
+            return await response.json();
+        };
+
+        const mapId = document.querySelector("head").dataset.mapid;
+        const map = await fetchMap(mapId);
+        nodes = map.nodes;
+        spec = map.spec;
+        console.log(nodes);
+        console.log(spec);
+
+    };
+
+
+    const setMediator = function (newMediator) {
+
+        mediator = newMediator;
+    };
+
+    const getNodes = function () {
+
+        return nodes;
+    };
+
+    const getSpec = function () {
+
+        return spec;
+    };
+    
+    return Object.freeze(
+        {
+            init,
+            setMediator,
+            getNodes,
+            getSpec,
+        }
+    );
+};
+
 const MapTranslator = function (spec) {
 
     const [[[minX0, maxX0], [minY0, maxY0]], [[minX1, maxX1], [minY1, maxY1]]] = spec;
@@ -78,26 +128,45 @@ const MapTranslator = function (spec) {
 const SvgMap = function () {
     
     let svg, container;
-    
-    const changeSvgBackground = function () {
-        
-        document.getElementById("map").style.backgroundColor = "hsla(78, 69%, 69%, 1.00)";
-    };
-
-    const fetchMap = async function (mapId) {
-        
-        const response = await fetch(`http://localhost:3000/api/map?id=${mapId}`);
-        
-        return await response.json();
-    };
+    const minZoom = 0.5;
+    const maxZoom = 1000;
+    let mediator;
 
     const initSvg = function () {
 
         svg = d3.select("svg");
         container = svg.append("g");
     };
+    
+    const changeSvgBackground = function () {
+        
+        document.getElementById("map").style.backgroundColor = "hsla(78, 69%, 69%, 1.00)";
+    };
 
-    const updateMap = async function () {
+    const addZoom = function () {
+
+        const zoom = d3.zoom()
+            .scaleExtent([minZoom, maxZoom])
+            .on("zoom", (event) => {
+                container.attr("transform", event.transform);
+            });
+
+        svg.call(zoom);
+    };
+
+    const init = function () {
+        
+        initSvg();
+        changeSvgBackground();
+        addZoom();
+    }();
+
+    const setMediator = function (newMediator) {
+
+        mediator = newMediator;
+    };
+
+    const update = function () {
 
         const updateSvg = function (nodesData) {
 
@@ -152,7 +221,6 @@ const SvgMap = function () {
                 return maxSize;
             };
 
-            
             const createNodes = function (translator) {
 
                 const nodes = container.selectAll("g.node")
@@ -223,56 +291,166 @@ const SvgMap = function () {
             document.getElementById("mapName").textContent = mapSpec["map_name"];
         };
 
-        const addZoom = function () {
-
-            const zoom = d3.zoom()
-                .scaleExtent([0.5, 1000]) // min and max zoom
-                .on("zoom", (event) => {
-                    container.attr("transform", event.transform);
-                });
-    
-            svg.call(zoom);
-        };
+        const nodesData = mediator.getNodes();
+        const mapSpec = mediator.getMapSpec();
         
-        const mapId = document.querySelector("head").dataset.mapid;
-
-        const map = await fetchMap(mapId);
-        const nodesData = map.nodes;
-        const mapSpec = map.spec;
-        console.log(nodesData);
-        console.log(mapSpec);
         updateSvg(nodesData);
         updateInfo(mapSpec);
-        addZoom();
     };
-
-    
-    const init = async function () {
-
-        initSvg();
-
-        changeSvgBackground();
-
-        updateMap();
-
-
-    }();
 
 
     return Object.freeze(
         {
-
+            setMediator,
+            update,
         }
     );
 };
 
+const Menu = function () {
+    
+    let nodeSelect;
+    let mediator;
 
-const main = async function () {
+    const init = function () {
+
+        nodeSelect = document.getElementById("nodeSelect");
+
+    }();
+
+    const setMediator = function (newMediator) {
+
+        mediator = newMediator;
+    };
+
+    const update = function () {
+
+        const addNodeSelectOptions = function (nodes) {
+
+            const createOption = function (node) {
+                
+                const option = document.createElement('option');
+                option.value = node.id;
+                option.textContent = node.label ?? node.id;
+                return option;
+            };
+
+            const compareTextContent = function (a, b) {
+
+                a = a.textContent;
+                b = b.textContent;
+
+                if (a == b) {
+                    return 0;
+                } else if (a < b) {
+                    return -1;
+                } else {
+                    return 1;
+                }
+            };
+            
+            const optionElements = [];
+            
+            for (let node of nodes) {
+                optionElements.push(createOption(node));
+            }
+
+            optionElements.sort(compareTextContent);
+            
+            for (let option of optionElements) {
+                nodeSelect.appendChild(option);
+            }
+        };
+
+
+        const nodes = mediator.getNodes();
+        addNodeSelectOptions(nodes);
+    };
+    
+    
+    return Object.freeze(
+        {
+            setMediator,
+            update,
+        }
+    );
+};
+
+const Mediator = function () {
+    
+    let nodesMap, svgMap, menu;
+    
+    const setNodesMap = function (newNodesMap) {
+
+        nodesMap = newNodesMap;
+    };
+    
+    const setSvgMap = function (newSvgMap) {
+
+        svgMap = newSvgMap;
+    };
+    
+    const setMenu = function (newMenu) {
+
+        menu = newMenu;
+    };
+
+    const getNodes = function () {
+
+        return nodesMap.getNodes();
+    };
+
+    const getMapSpec = function () {
+
+        return nodesMap.getSpec();
+    };
+    
+    return Object.freeze(
+        {
+            setNodesMap,
+            setSvgMap,
+            setMenu,
+            getNodes,
+            getMapSpec,
+        }
+    );
+};
+
+const build = async function () {
+
+    let nodesMap, svgMap, menu;
+    let mediator;
+
+    const setMediator = function () {
+
+        mediator = Mediator();
+        mediator.setNodesMap(nodesMap);
+        mediator.setSvgMap(svgMap);
+        mediator.setMenu(menu);
+        
+        for (let component of [nodesMap, svgMap, menu]) {
+            component.setMediator(mediator);
+        }
+    };
+
+    nodesMap = NodesMap();
+    await nodesMap.init();
+
+    svgMap = SvgMap();
+    menu = Menu();
+    
+    setMediator();
+
+    for (let component of [svgMap, menu]) {
+        component.update();
+    }
+};
+
+
+const main = function () {
     
     console.log("This is map script...");
     
-    
-    const svgMap = SvgMap();
-    
+    build();
     
 }();

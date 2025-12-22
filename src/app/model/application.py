@@ -1,7 +1,7 @@
 from myfiles import Storage, FilesManager, Repository
 from mytext import TextEditor
-from .Mapper import Mapper
-from .Preprocessor import Preprocessor
+from .mapper import Mapper
+from .preprocessor import Preprocessor
 from .nodes import NodesSpecApi
 import requests
 from requests import Response
