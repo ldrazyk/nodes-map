@@ -1,4 +1,5 @@
 from myfiles import Repository
+import numpy as np
 
 class NodesSpecApi:
 
@@ -48,11 +49,11 @@ class NodesSpecApi:
             
             def parse_key_and_feature_scale(column_name:str):
 
-                if column_name[0] in ["$", "#"]:
+                if column_name[0] in ["$", "&", "%", "#"]:
 
                     scale = float(column_name[1:4])
 
-                    if column_name[0] == "$":
+                    if column_name[0] in ["$", "%"]:
 
                         key = column_name[4:]
                     else:
@@ -63,6 +64,20 @@ class NodesSpecApi:
 
                 return key, scale
 
+            def parse_percenile_convert(column_name:str):
+
+                 if column_name[0] in ["%", "#"]:
+                    return True
+
+            def get_percentiles(data, j, key):
+
+                print(f"\nGetting percentiles for key '{key}'")
+
+                arr = np.array([row[j] for row in data], dtype=float)
+                print(arr)
+                percentiles = np.searchsorted(np.sort(arr), arr) / (len(arr) - 1) * 100
+                print(percentiles)
+                return percentiles
 
             columns, data = get_columns_and_data()
 
@@ -71,6 +86,7 @@ class NodesSpecApi:
             for j, column_name in enumerate(columns):
 
                 key, feature_scale = parse_key_and_feature_scale(column_name)
+                percentile_convert = parse_percenile_convert(column_name)
 
                 if key:
                     spec[key] = []
@@ -78,12 +94,20 @@ class NodesSpecApi:
                 if feature_scale:
                     spec["feature_scale"].append(feature_scale)
 
+                if percentile_convert:
+                    percentiles = get_percentiles(data, j, key)
+
                 for i, array in enumerate(data):
                     
                     if j == 0:
                         spec["embedding"].append([])
 
                     value = array[j]
+
+                    if percentile_convert:
+                        value = percentiles[i]
+                    elif feature_scale:
+                        value = float(value)
 
                     if feature_scale:
                         spec["embedding"][i].append(value)

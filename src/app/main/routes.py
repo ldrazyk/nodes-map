@@ -6,6 +6,7 @@ from app import application
 def show_form():
 
     map_ids = application.get_map_ids()
+    map_ids.sort()
 
     return render_template('form.html', map_ids=map_ids)
 
@@ -13,7 +14,7 @@ def show_form():
 def show_map():
 
     map_id = request.args.get("id")
-
+    
     return render_template('map.html', map_id=map_id)
 
 @main.route('/map/test')

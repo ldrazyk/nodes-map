@@ -6,6 +6,7 @@ from .nodes import NodesSpecApi
 import requests
 from requests import Response
 from pprint import pprint
+from scipy.sparse import csr_matrix
 
 class Application:
 
@@ -26,7 +27,7 @@ class Application:
                                           files_manager=self.files_manager, 
                                           text_editor=self.text_editor)
 
-    def __get_data_from_response(self, response:Response):
+    def _get_data_from_response(self, response:Response):
 
         if response.status_code == 200:
             try:
@@ -57,11 +58,19 @@ class Application:
                 params["id"] = id
                 
             response = requests.get(url=api_spec["url"], params=params)
-            nodes_spec = self.__get_data_from_response(response)
+            nodes_spec = self._get_data_from_response(response)
             # print(nodes_spec)
+
             return nodes_spec
         
         def preprocess(nodes_spec:dict, preprocess_spec:dict):
+
+            def get_embedding_from_coo(coo:dict):
+
+                matrix = csr_matrix((coo['data'], (coo['row'], coo['col'])), shape=coo['shape'], dtype="float32")
+                array = matrix.toarray()
+                print(array.shape)
+                return array
 
             def standardize_features(nodes_spec:dict):
                 
@@ -91,6 +100,11 @@ class Application:
                 nodes_spec["embedding"] = self.preprocessor.scale_features(embeddings=nodes_spec["embedding"], 
                                                                            feature_scale=nodes_spec["feature_scale"])
             
+
+            if "coo" in nodes_spec:
+
+               nodes_spec["embedding"] = get_embedding_from_coo(nodes_spec["coo"])
+
             if "embedding" in nodes_spec:
 
                 print("Preprocessing embeddings...")

@@ -226,7 +226,7 @@ const SvgMap = function () {
         const addZoom = function () {
 
             const zoom = d3.zoom()
-                .scaleExtent([0.5, 20]) // min and max zoom
+                .scaleExtent([0.5, 1000]) // min and max zoom
                 .on("zoom", (event) => {
                     container.attr("transform", event.transform);
                 });

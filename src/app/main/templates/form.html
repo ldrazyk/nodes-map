@@ -75,7 +75,7 @@
                             <h4>Cluster Size</h4>
                             <div class="line">
                                 <label for="min-cluster">min:</label>
-                                <input type="number" name="min-cluster" id="min-cluster" min="1" max="20" step="1" value="1">
+                                <input type="number" name="min-cluster" id="min-cluster" min="1" max="20" step="1" value="3">
                                 <label for="max-cluster">max:</label>
                                 <input type="number" name="max-cluster" id="max-cluster" min="0" max="50" step="1" value="0">
                             </div>
@@ -88,6 +88,7 @@
                             <select name="metric" id="metric">
                                 <option value="cosine">cosine</option>
                                 <option value="euclidean">euclidean</option>
+                                <option value="precomputed">precomputed</option>
                             </select>
                             <div class="line">
                                 <label for="n-neighbors">n neighbors</label>
@@ -99,11 +100,11 @@
                             </div>
                             <div class="line">
                                 <label for="min-distance">min distance</label>
-                                <input type="number" name="min-distance" id="min-distance" min="0.1" max="10.0" step="0.1" value="0.1">
+                                <input type="number" name="min-distance" id="min-distance" min="0.1" max="10.0" step="0.1" value="1.0">
                             </div>
                             <div class="line">
                                 <label for="spread">spread</label>
-                                <input type="number" name="spread" id="spread" min="0.5" max="10.0" step="0.1" value="1.0">
+                                <input type="number" name="spread" id="spread" min="0.5" max="10.0" step="0.1" value="3.0">
                             </div>
                         </div>
                     </section>

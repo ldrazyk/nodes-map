@@ -8,3 +8,4 @@ img/
 *.png
 *.jpg
 d3*.js
+src/app/static/images/*

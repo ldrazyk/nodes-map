@@ -59,6 +59,8 @@ class Mapper:
                 else:
                     metric = mapping_spec.get("metric", "euclidean")
 
+                print(metric)
+
                 reducer = UMAP(n_components=2, 
                                 n_neighbors=mapping_spec.get("n_neighbors", 15),
                                 metric=metric, 
@@ -92,14 +94,19 @@ class Mapper:
                     "cluster": clusters[n]
                 }
 
-                absent_keys = ["matrix", "feature_scale"]
+                absent_keys = ["matrix", "coo", "feature_scale"]
 
                 if "embedding" in nodes_spec and len(nodes_spec["embedding"][0]) > 32:
                     absent_keys.append("embedding")
 
                 for key, spec_list in nodes_spec.items():
                     if key not in absent_keys:
-                        node[key] = spec_list[n]
+                        try:
+                            node[key] = spec_list[n]
+                        except Exception as e:
+                            print("Exception type:", type(e).__name__)
+                            print("Exception message:", e)
+                            print(f"key: {key}, n: {n}")
                 
                 nodes.append(node)
 
