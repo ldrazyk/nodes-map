@@ -1,1 +1,1 @@
-from .NodesSpecApi import NodesSpecApi
+from .nodes_spec_api import NodesSpecApi

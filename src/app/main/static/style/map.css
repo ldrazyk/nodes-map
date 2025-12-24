@@ -12,8 +12,17 @@ svg#map {
     flex-grow: 1;
 }
 
+g.node {
+    opacity: 0.5;
+}
+
+g.node:hover {
+    opacity: 1;
+    cursor: pointer;
+}
+
 text.label {
-    /* font-size: 5px; */
+    /* opacity: 0.5; */
 }
 
 g.node>rect {

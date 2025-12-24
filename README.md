@@ -1,6 +1,8 @@
 # Nodes Map
 
-This project shows nodes with x, y coordinates in html with Flask.
+This project creates 2d map from dataset with embeddings.
+
+# Dev
 
 ## Run Server
 
@@ -8,4 +10,3 @@ This project shows nodes with x, y coordinates in html with Flask.
 source .venv/bin/activate
 python3 src/run.py
 ```
-

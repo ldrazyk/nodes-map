@@ -2,8 +2,9 @@
 
 const NodesMap = function () {
     
-    let nodes, spec;
+    let nodes, spec, nodesDict;
     let mediator;
+    let selectedId = false;
 
     const init = async function () {
 
@@ -14,19 +15,46 @@ const NodesMap = function () {
             return await response.json();
         };
 
+        const createNodesDict = function (nodes) {
+
+            const nodesDict = {};
+
+            for (let node of nodes) {
+                nodesDict[node.id] = node;
+            }
+
+            return nodesDict;
+        };
+
         const mapId = document.querySelector("head").dataset.mapid;
         const map = await fetchMap(mapId);
-        nodes = map.nodes;
         spec = map.spec;
-        console.log(nodes);
+        nodes = map.nodes;
+        nodesDict = createNodesDict(nodes);
         console.log(spec);
+        console.log(nodes);
 
     };
-
 
     const setMediator = function (newMediator) {
 
         mediator = newMediator;
+    };
+    
+    const select = function (id) {
+
+        selectedId = id;
+        console.log(`Selected '${id}' node.`);
+    };
+
+    const getSelected = function () {
+
+        return nodesDict[selectedId];
+    };
+
+    const getNode = function (id) {
+
+        return nodesDict[id];
     };
 
     const getNodes = function () {
@@ -38,11 +66,16 @@ const NodesMap = function () {
 
         return spec;
     };
+
+
     
     return Object.freeze(
         {
             init,
             setMediator,
+            select,
+            getSelected,
+            getNode,
             getNodes,
             getSpec,
         }
@@ -229,7 +262,8 @@ const SvgMap = function () {
                     .append("g")
                     .attr("class", "node")
                     .attr("id", d => d.id)
-                    .attr("transform", d => `translate(${translator.translateX(d.x)}, ${translator.translateY(d.y)})`);
+                    .attr("transform", d => `translate(${translator.translateX(d.x)}, ${translator.translateY(d.y)})`)
+                    .on("click", (event, d) => mediator.selectNode(d.id));
 
                 return nodes
             };
@@ -309,14 +343,94 @@ const SvgMap = function () {
 
 const Menu = function () {
     
-    let nodeSelect;
+    let nodeSelect, selectedImage, selectedInfo;
     let mediator;
+
+    
+    const setElements = function () {
+
+        nodeSelect = document.getElementById("nodeSelect");
+        selectedImage = document.getElementById("selectedImage");
+        selectedInfo = document.getElementById("selectedInfo");
+        
+    };
+
+    const updateSelected = function () {
+
+        const updateInfo = function (selected) {
+
+
+            const appendInfoLine = function (key, value) {
+
+                const line = document.createElement("div");
+                line.classList.add("line");
+
+                const keyElement = document.createElement("p");
+                keyElement.classList.add("infoKey");
+                keyElement.textContent = key + ": ";
+                line.appendChild(keyElement);
+
+                const valueElement = document.createElement("p");
+                valueElement.classList.add("infoValue");
+                if (typeof value === 'object') {
+                    value = JSON.stringify(value);
+                }
+                valueElement.textContent = value;
+                line.appendChild(valueElement);
+
+                selectedInfo.appendChild(line);
+            };
+
+            selectedInfo.replaceChildren();
+
+            const basicKeys = ["id", "label", "cluster"];
+            
+            for (const key of basicKeys) {
+                if (key in selected) {
+                    appendInfoLine(key, selected[key]);
+                }
+            }
+
+            const ignoredKeys = [...basicKeys, "x", "y", "image"];
+
+            for (const [key, value] of Object.entries(selected)) {
+                if (!ignoredKeys.includes(key)) {
+                    appendInfoLine(key, value);
+                }
+            }
+
+        };
+
+        selected = mediator.getSelected();
+        // console.log(selected);
+        selectedImage.src = selected.image;
+        updateInfo(selected);
+        
+    };
+
+    const onSelect = function () {
+
+        const id = nodeSelect.value;
+        mediator.selectNode(id);
+        // updateSelected();
+    };
+
+    const addEvents = function () {
+
+        const addSelectNode = function () {
+
+            nodeSelect.addEventListener("change", onSelect)
+        };
+
+        addSelectNode();
+    };
 
     const init = function () {
 
-        nodeSelect = document.getElementById("nodeSelect");
-
+        setElements();
+        addEvents();
     }();
+
 
     const setMediator = function (newMediator) {
 
@@ -372,6 +486,7 @@ const Menu = function () {
         {
             setMediator,
             update,
+            updateSelected,
         }
     );
 };
@@ -395,6 +510,25 @@ const Mediator = function () {
         menu = newMenu;
     };
 
+    // nodesMap
+
+    
+    const selectNode = function (id) {
+
+        nodesMap.select(id);
+        menu.updateSelected(id);
+    };
+
+    const getSelected = function () {
+
+        return nodesMap.getSelected();
+    };
+
+    const getNode = function (id) {
+
+        return nodesMap.getNode(id);
+    };
+
     const getNodes = function () {
 
         return nodesMap.getNodes();
@@ -410,6 +544,10 @@ const Mediator = function () {
             setNodesMap,
             setSvgMap,
             setMenu,
+            // nodesMap
+            selectNode,
+            getSelected,
+            getNode,
             getNodes,
             getMapSpec,
         }
