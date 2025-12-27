@@ -5,6 +5,7 @@ const NodesMap = function () {
     let nodes, spec, nodesDict;
     let mediator;
     let selectedId = false;
+    
 
     const init = async function () {
 
@@ -160,10 +161,16 @@ const MapTranslator = function (spec) {
 
 const SvgMap = function () {
     
-    let svg, container;
+    let svg, container, translator;
+    let mediator;
+    
     const minZoom = 0.5;
     const maxZoom = 1000;
-    let mediator;
+    const overlappingNodesFraction = 0.9;   // to get nodes size (fraction of nodes that overlap)
+    const labelTextSize = 0.3;
+    const labelOffset = 0.8;
+    let maxSize;
+    
 
     const initSvg = function () {
 
@@ -203,7 +210,6 @@ const SvgMap = function () {
 
         const updateSvg = function (nodesData) {
 
-            let maxSize;
 
             const getMapTranslator = function () {
 
@@ -238,23 +244,27 @@ const SvgMap = function () {
                 };
 
                 const distances = getDistances();
-                const closeNodesFraction = 0.13;
-                const quantileLevel = closeNodesFraction / nodesData.length;
+                
+                const quantileLevel = overlappingNodesFraction / nodesData.length;
                 const quantile = d3.quantile(distances, quantileLevel);
                 const min = d3.min(distances);
                 const maxSize = quantile * scale / 1.4;
 
-                console.log(`nodes.length: ${nodesData.length}`);
-                console.log(`30 / nodes.length: ${30 / nodesData.length}`);
-                console.log(`min: ${min}`);
-                console.log(`quantileLevel: ${quantileLevel}`);
-                console.log(`quantile: ${quantile}`);
-                console.log(`maxSize: ${maxSize}`);
+                const testLog = true;
+
+                if (testLog) {
+                    console.log(`nodes.length: ${nodesData.length}`);
+                    console.log(`30 / nodes.length: ${30 / nodesData.length}`);
+                    console.log(`min: ${min}`);
+                    console.log(`quantileLevel: ${quantileLevel}`);
+                    console.log(`quantile: ${quantile}`);
+                    console.log(`maxSize: ${maxSize}`);
+                }
 
                 return maxSize;
             };
 
-            const createNodes = function (translator) {
+            const createNodes = function () {
 
                 const nodes = container.selectAll("g.node")
                     .data(nodesData, d => d.id)
@@ -262,6 +272,7 @@ const SvgMap = function () {
                     .append("g")
                     .attr("class", "node")
                     .attr("id", d => d.id)
+                    .attr("data-cluster", d => d.cluster || -1)
                     .attr("transform", d => `translate(${translator.translateX(d.x)}, ${translator.translateY(d.y)})`)
                     .on("click", (event, d) => mediator.selectNode(d.id));
 
@@ -306,15 +317,15 @@ const SvgMap = function () {
 
                 nodes.append("text")
                     .attr("class", "label")
-                    .attr("y", d => getSize(d) * 1.0)
-                    .attr("font-size", maxSize * 0.5)
+                    .attr("y", d => getSize(d) * labelOffset)
+                    .attr("font-size", maxSize * labelTextSize)
                     .attr("text-anchor", "middle")
                     .text(d => d.label || d.id);
             };
 
-            const translator = getMapTranslator();
+            translator = getMapTranslator();
             maxSize = getMaxSize(translator.getScale());
-            const nodes = createNodes(translator);
+            const nodes = createNodes();
             addRects(nodes);
             addLabels(nodes);
             
@@ -332,11 +343,21 @@ const SvgMap = function () {
         updateInfo(mapSpec);
     };
 
+    const scaleNodes = function (scale) {
+
+        console.log(`Scaling nodes by scale ${scale}`);
+        container.selectAll("g.node")
+            .transition()
+            .duration(500)
+            .attr("transform", d => `translate(${translator.translateX(d.x)}, ${translator.translateY(d.y)}) scale(${scale})`);
+    };
+
 
     return Object.freeze(
         {
             setMediator,
             update,
+            scaleNodes,
         }
     );
 };
@@ -344,6 +365,7 @@ const SvgMap = function () {
 const Menu = function () {
     
     let nodeSelect, selectedImage, selectedInfo;
+    let nodesScale, scaleNodesBtn;
     let mediator;
 
     
@@ -352,6 +374,8 @@ const Menu = function () {
         nodeSelect = document.getElementById("nodeSelect");
         selectedImage = document.getElementById("selectedImage");
         selectedInfo = document.getElementById("selectedInfo");
+        nodesScale = document.getElementById("nodesScale");
+        scaleNodesBtn = document.getElementById("scaleNodesBtn");
         
     };
 
@@ -419,10 +443,22 @@ const Menu = function () {
 
         const addSelectNode = function () {
 
-            nodeSelect.addEventListener("change", onSelect)
+            nodeSelect.addEventListener("change", onSelect);
+        };
+
+        const addScaleNodes = function () {
+            
+            const scaleNodes = function () {
+
+                const scale = nodesScale.value;
+                mediator.scaleNodes(scale);
+            };
+
+            scaleNodesBtn.addEventListener("click", scaleNodes);
         };
 
         addSelectNode();
+        addScaleNodes();
     };
 
     const init = function () {
@@ -538,6 +574,13 @@ const Mediator = function () {
 
         return nodesMap.getSpec();
     };
+
+    // svgMap
+
+    const scaleNodes = function (scale) {
+
+        svgMap.scaleNodes(scale);
+    };
     
     return Object.freeze(
         {
@@ -550,6 +593,8 @@ const Mediator = function () {
             getNode,
             getNodes,
             getMapSpec,
+            // svgMap
+            scaleNodes,
         }
     );
 };

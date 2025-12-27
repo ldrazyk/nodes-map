@@ -1,9 +1,9 @@
-from src.app.model import Mapper, EmbeddingsProcessor
+from src.app.model import Mapper, Preprocessor
 import numpy as np
 import pprint
 
 mapper = Mapper(random_state=11, min_cluster_size=2, max_cluster_size=0, n_neighbors=5, metric="cosine", min_dist=0.5, spread=2.0)
-processor = EmbeddingsProcessor()
+processor = Preprocessor()
 
 def test_Mapper():
 
