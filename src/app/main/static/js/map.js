@@ -53,6 +53,11 @@ const NodesMap = function () {
         return nodesDict[selectedId];
     };
 
+    const getSelectedId = function () {
+
+        return selectedId;
+    };
+
     const getNode = function (id) {
 
         return nodesDict[id];
@@ -68,7 +73,6 @@ const NodesMap = function () {
         return spec;
     };
 
-
     
     return Object.freeze(
         {
@@ -76,6 +80,7 @@ const NodesMap = function () {
             setMediator,
             select,
             getSelected,
+            getSelectedId,
             getNode,
             getNodes,
             getSpec,
@@ -163,7 +168,10 @@ const SvgMap = function () {
     
     let svg, container, translator;
     let mediator;
-    
+    let selectedNode;
+    let zoom;
+    let nodesScale = 1;
+
     const minZoom = 0.5;
     const maxZoom = 1000;
     const overlappingNodesFraction = 0.9;   // to get nodes size (fraction of nodes that overlap)
@@ -185,7 +193,7 @@ const SvgMap = function () {
 
     const addZoom = function () {
 
-        const zoom = d3.zoom()
+        zoom = d3.zoom()
             .scaleExtent([minZoom, maxZoom])
             .on("zoom", (event) => {
                 container.attr("transform", event.transform);
@@ -302,6 +310,16 @@ const SvgMap = function () {
                     .attr("height", getSize);
 
 
+                nodes.append("circle")
+                    .attr("cx", 0)
+                    .attr("cy", 0)
+                    .attr("r", d => getSize(d) * 1)
+                    .attr("stroke-width", d => getSize(d) / 20)
+                    .attr("stroke", "red")
+                    .attr("fill", "none")
+                    .attr("class", "ring");
+
+
                 if (nodesData[0].image) {
                     
                     nodes.append("image")
@@ -323,6 +341,7 @@ const SvgMap = function () {
                     .text(d => d.label || d.id);
             };
 
+
             translator = getMapTranslator();
             maxSize = getMaxSize(translator.getScale());
             const nodes = createNodes();
@@ -343,6 +362,15 @@ const SvgMap = function () {
         updateInfo(mapSpec);
     };
 
+    const selectNode = function (id) {
+
+        if (selectedNode) {
+            selectedNode.classList.remove('selected');
+        }
+        selectedNode = document.getElementById(id);
+        selectedNode.classList.add('selected');
+    };
+
     const scaleNodes = function (scale) {
 
         console.log(`Scaling nodes by scale ${scale}`);
@@ -350,21 +378,58 @@ const SvgMap = function () {
             .transition()
             .duration(500)
             .attr("transform", d => `translate(${translator.translateX(d.x)}, ${translator.translateY(d.y)}) scale(${scale})`);
+        nodesScale = scale;
     };
 
+    const zoomToNode = function (id) {
+
+
+        const getTranslate = function (id) {
+
+            const node = mediator.getNode(id);
+            const x = translator.translateX(node.x);
+            const y = translator.translateY(node.y);
+
+            const { width, height } = svg.node().getBoundingClientRect();
+            console.log(width);
+            console.log(height);
+            console.log(svg.node());
+            
+            const xTranslate = width / 2 - x * zoomScale;
+            const yTranslate = height / 2 - y * zoomScale;
+
+            return [xTranslate, yTranslate];
+        };
+
+
+        console.log(`Zooming to node ${id}`);
+        
+        const zoomScale = 10;
+        const [xTranslate, yTranslate] = getTranslate(id);
+
+
+        svg.transition()
+            .duration(750)
+            .call(
+                zoom.transform,
+                d3.zoomIdentity.translate(xTranslate, yTranslate).scale(zoomScale)
+            );
+    };
 
     return Object.freeze(
         {
             setMediator,
             update,
+            selectNode,
             scaleNodes,
+            zoomToNode,
         }
     );
 };
 
 const Menu = function () {
     
-    let nodeSelect, selectedImage, selectedInfo;
+    let nodeSelect, selectedImage, selectedInfo, zoomToNodeBtn;
     let nodesScale, scaleNodesBtn;
     let mediator;
 
@@ -376,6 +441,7 @@ const Menu = function () {
         selectedInfo = document.getElementById("selectedInfo");
         nodesScale = document.getElementById("nodesScale");
         scaleNodesBtn = document.getElementById("scaleNodesBtn");
+        zoomToNodeBtn = document.getElementById("zoomToNodeBtn");
         
     };
 
@@ -457,8 +523,14 @@ const Menu = function () {
             scaleNodesBtn.addEventListener("click", scaleNodes);
         };
 
+        const addZoomToNode = function () {
+
+            zoomToNodeBtn.addEventListener("click", () => mediator.zoomToNode());
+        };
+
         addSelectNode();
         addScaleNodes();
+        addZoomToNode();
     };
 
     const init = function () {
@@ -530,6 +602,7 @@ const Menu = function () {
 const Mediator = function () {
     
     let nodesMap, svgMap, menu;
+
     
     const setNodesMap = function (newNodesMap) {
 
@@ -553,6 +626,7 @@ const Mediator = function () {
 
         nodesMap.select(id);
         menu.updateSelected(id);
+        svgMap.selectNode(id);
     };
 
     const getSelected = function () {
@@ -581,6 +655,12 @@ const Mediator = function () {
 
         svgMap.scaleNodes(scale);
     };
+
+    const zoomToNode = function () {
+
+        const selectedId = nodesMap.getSelectedId();
+        svgMap.zoomToNode(selectedId);
+    };
     
     return Object.freeze(
         {
@@ -595,6 +675,7 @@ const Mediator = function () {
             getMapSpec,
             // svgMap
             scaleNodes,
+            zoomToNode,
         }
     );
 };
